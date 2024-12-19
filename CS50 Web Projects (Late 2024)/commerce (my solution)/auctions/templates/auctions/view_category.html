@@ -1,0 +1,20 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Category: {{ category }}</h2>
+    <ol>
+    {% for listing in category_items %}
+        <hr width="100%" size="3" color="gray">
+        <a href="{% url 'view_item' listing.id %}">
+            <li><h6>{{ listing.title }}</h6></li>
+            <p><img src="{{ listing.imageurl }}" height=150 alt="No Image Available"></p> 
+            <p>Description: {{ listing.description }}</p>
+            {% if listing.starting_bid > listing.current_bid %}
+                <p>Current Price: ${{ listing.starting_bid }}</p>
+            {% else %}
+                <p>Current Price: ${{ listing.current_bid }}</p>
+            {% endif %}
+        </a>
+    {% endfor %}
+    </ol>
+{% endblock %}

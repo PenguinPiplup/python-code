@@ -1,0 +1,10 @@
+textarea {
+    min-height: 400px;
+}
+
+.mainpage_email {
+    border: 2px solid black;
+    padding: 7px;
+    background-color: white;
+    font-size: 20px;
+}

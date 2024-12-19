@@ -1,0 +1,74 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% if listing.auction_closed == True %}
+        <div>
+            <h3 style="color:red;">Note: Auction has been closed.</h3>
+        </div>
+        {% if listing.current_bidder == user %}
+            <div>
+                <h3 style="color:green;">Congrats! You have won this auction.</h3>
+            </div>
+        {% endif %}
+    {% endif %}
+    <h2>Details of Item</h2>
+
+    <h4 style="display: inline; margin-right: 10px;">Item: {{ listing.title }}</h4>
+    {% if user.is_authenticated %}
+        {% if listing in user.watchlisted_listings.all %}
+            <a href="{% url 'remove_watchlist' listing.id %}"><button type="button">Remove from Watchlist</button></a>
+        {% else %}
+            <a href="{% url 'add_watchlist' listing.id %}"><button type="button">Watchlist</button></a>
+        {% endif %}
+    {% endif %}
+     
+    <p><img src="{{ listing.imageurl }}" height=250 alt="N.A."></p>
+    <p><b>Description:</b> {{ listing.description }}</p>
+    <p><b>Category:</b> {{ listing.category }}</p>
+    <p><b>Seller:</b> {{ listing.seller }}</p>
+    <p><b>Starting Bid:</b> ${{ listing.starting_bid }}</p>
+    <p><b>Current Highest Bid:</b> ${{ listing.current_bid }} (Current Bidder: {{ listing.current_bidder }})</p>
+    {% if user.is_authenticated and not listing.auction_closed %}
+        <p><form action="{% url 'view_item' listing.id %}" method="POST">
+            {% csrf_token %}
+            $ <input type="number" name="bid" step="0.01" required> <input type="submit" value="Place A Bid">
+        </form></p>
+    {% endif %}
+    
+    <hr width="100%" size="3" color="gray">
+
+    <h5><u>Comments</u></h5>
+
+    {% for comment in listing.comments.all %}
+        <p><b>User:</b> {{ comment.commenter }}</p>
+        <p><b>Comment:</b> {{ comment.comment }}</p>
+        <p><b>Date/Time:</b> {{ comment.datetime }}</p>
+        <hr width="100%" size="3" color="gray">
+    {% endfor %}
+    
+    {% if user.is_authenticated %}
+        {% if listing.auction_closed == False %}
+            <form action="{% url 'comment' listing.id %}" method="post">
+                {% csrf_token %}
+                {{ CommentForm }}
+                <button type="submit">Add Comment</button>
+            </form>
+
+            <hr width="100%" size="3" color="gray">
+        {% endif %}
+    {% endif %}
+    
+
+    {% if user.is_authenticated %}
+        {% if listing in user.watchlisted_listings.all %}
+        <a href="{% url 'remove_watchlist' listing.id %}"><button type="button">Remove Item from Watchlist</button></a>
+        {% else %}
+            <a href="{% url 'add_watchlist' listing.id %}"><button type="button">Add Item to Watchlist</button></a>
+        {% endif %}
+
+        {% if user == listing.seller and listing.auction_closed == False %}
+            <a href="{% url 'close_auction' listing.id %}"><button type="button">Close Auction</button></a>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}
